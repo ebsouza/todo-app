@@ -3,16 +3,19 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 
-	handlers "todo/server/router"
+	"todo/server/tasks"
+
+	"todo/server/common/db"
 )
 
-
 func main() {
-	router := gin.Default()
-	router.GET("/tasks", handlers.GetTasks)
-	router.GET("/tasks/:id", handlers.GetTaskByID)
-	router.POST("/tasks", handlers.PostTasks)
-	router.DELETE("/tasks/:id", handlers.RemoveTaskByID)
 
-	router.Run(":8080")
+	router := gin.Default()
+
+	dbUrl := db.BuildConnectionString()
+	dbHandler := db.Init(dbUrl)
+
+	tasks.RegisterRoutes(router, dbHandler)
+
+	router.Run()
 }
