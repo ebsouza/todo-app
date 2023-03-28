@@ -1,7 +1,10 @@
-package domain
+package tasks
+
+import "gorm.io/gorm"
 
 type Task struct {
-	ID          string `json:"id"`
+	gorm.Model
+	ID          string `json:id`
 	Title       string `json:title`
 	Description string `json:description`
 	Status      string `json:status`
