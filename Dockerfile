@@ -4,9 +4,10 @@ WORKDIR /app
 
 COPY . .
 
-RUN go mod init todo/server
-
-RUN go get .
+RUN rm *.mod &&\
+    rm *.sum &&\
+    go mod init todo/server &&\
+    go get .
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /webserver
 
