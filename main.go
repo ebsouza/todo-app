@@ -14,6 +14,7 @@ func main() {
 
 	dbUrl := db.BuildConnectionString()
 	dbHandler := db.Init(dbUrl)
+	dbHandler.AutoMigrate(&tasks.Task{})
 
 	tasks.RegisterRoutes(router, dbHandler)
 

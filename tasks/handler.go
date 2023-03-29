@@ -21,7 +21,6 @@ func (h handler) PostTasks(ctx *gin.Context) {
 	}
 
 	var task Task
-	task.ID = schema.ID
 	task.Title = schema.Title
 	task.Description = schema.Description
 	task.Status = schema.Status
