@@ -49,7 +49,7 @@ func (h handler) GetTaskByID(ctx *gin.Context) {
 
 	var task Task
 
-	if result := h.DB.First(&task, id); result.Error != nil {
+	if result := h.DB.First(&task, "id = ?", id); result.Error != nil {
 		ctx.IndentedJSON(http.StatusNotFound, gin.H{"error": result.Error.Error()})
 		return
 	}
