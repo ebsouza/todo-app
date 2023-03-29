@@ -39,10 +39,10 @@ func Init(url string) *gorm.DB {
 }
 
 type Base struct {
-	ID        uuid.UUID `gorm:"type:uuid;primary_key;"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt *time.Time `sql:"index"`
+	ID        uuid.UUID `gorm:"type:uuid;primary_key;" json:"id"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+	DeletedAt *time.Time `sql:"index" json:"-"`
 }
 
 func (b *Base) BeforeCreate(ctx *gorm.DB) (err error) {
