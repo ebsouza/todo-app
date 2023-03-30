@@ -44,9 +44,3 @@ type Base struct {
 	UpdatedAt time.Time `json:"-"`
 	DeletedAt *time.Time `sql:"index" json:"-"`
 }
-
-func (b *Base) BeforeCreate(ctx *gorm.DB) (err error) {
-	b.ID = uuid.New()
-
-	return
-}
