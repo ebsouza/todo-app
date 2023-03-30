@@ -72,3 +72,28 @@ func (h handler) RemoveTaskByID(ctx *gin.Context) {
 
 	ctx.IndentedJSON(http.StatusOK, task)
 }
+
+func (h handler) UpdateTask(ctx *gin.Context) {
+    id := ctx.Param("id")
+    var schema Task
+
+    if err := ctx.BindJSON(&schema); err != nil {
+        ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    var task Task
+
+	if result := h.DB.First(&task, "id = ?", id); result.Error != nil {
+		ctx.IndentedJSON(http.StatusNotFound, gin.H{"error": result.Error.Error()})
+		return
+	}
+
+    task.Title = schema.Title
+    task.Description = schema.Description
+    task.Status = schema.Status
+
+    h.DB.Save(&task)
+
+    ctx.JSON(http.StatusOK, task)
+}
