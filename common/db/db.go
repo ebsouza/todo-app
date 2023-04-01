@@ -2,12 +2,10 @@ package db
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
 	"os"
-	"time"
 )
 
 func BuildConnectionString() string {
@@ -36,11 +34,4 @@ func Init(url string) *gorm.DB {
 	}
 
 	return db
-}
-
-type Base struct {
-	ID        uuid.UUID `gorm:"type:uuid;primary_key;" json:"id"`
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
-	DeletedAt *time.Time `sql:"index" json:"-"`
 }
