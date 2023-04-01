@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-
-	"github.com/google/uuid"
 )
 
 type handler struct {
@@ -13,18 +11,12 @@ type handler struct {
 }
 
 func (h handler) PostTasks(ctx *gin.Context) {
-	var schema Task
+	task := &Task{}
 
-	if err := ctx.BindJSON(&schema); err != nil {
+	if err := ctx.BindJSON(task); err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	var task Task
-	task.ID = uuid.New()
-	task.Title = schema.Title
-	task.Description = schema.Description
-	task.Status = schema.Status
 
 	err := h.Repository.AddTask(task)
 	if err != nil {
@@ -32,9 +24,8 @@ func (h handler) PostTasks(ctx *gin.Context) {
 		return
 	}
 
-	ctx.IndentedJSON(http.StatusCreated, task)
+	ctx.IndentedJSON(http.StatusCreated, *task)
 }
-
 
 func (h handler) GetTasks(ctx *gin.Context) {
 	tasks, err := h.Repository.GetAllTasks()
@@ -46,7 +37,6 @@ func (h handler) GetTasks(ctx *gin.Context) {
 
 	ctx.IndentedJSON(http.StatusOK, tasks)
 }
-
 
 func (h handler) GetTaskByID(ctx *gin.Context) {
 	id := ctx.Param("id")
@@ -75,20 +65,20 @@ func (h handler) RemoveTaskByID(ctx *gin.Context) {
 }
 
 func (h handler) UpdateTask(ctx *gin.Context) {
-    id := ctx.Param("id")
-    var task_info Task
+	id := ctx.Param("id")
+	var task_info Task
 
-    if err := ctx.BindJSON(&task_info); err != nil {
-        ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
+	if err := ctx.BindJSON(&task_info); err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-    task, err := h.Repository.UpdateTask(id, task_info)
+	task, err := h.Repository.UpdateTask(id, task_info)
 
 	if err != nil {
 		ctx.IndentedJSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
-    ctx.JSON(http.StatusOK, task)
+	ctx.JSON(http.StatusOK, task)
 }
