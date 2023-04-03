@@ -10,7 +10,7 @@ type handler struct {
 	Repository *repository
 }
 
-func (h handler) PostTasks(ctx *gin.Context) {
+func (h handler) PostTask(ctx *gin.Context) {
 	task := &Task{}
 
 	if err := ctx.BindJSON(task); err != nil {
@@ -24,7 +24,7 @@ func (h handler) PostTasks(ctx *gin.Context) {
 		return
 	}
 
-	ctx.IndentedJSON(http.StatusCreated, *task)
+	ctx.IndentedJSON(http.StatusCreated, task)
 }
 
 func (h handler) GetTasks(ctx *gin.Context) {
@@ -66,9 +66,9 @@ func (h handler) RemoveTaskByID(ctx *gin.Context) {
 
 func (h handler) UpdateTask(ctx *gin.Context) {
 	id := ctx.Param("id")
-	var task_info Task
+	task_info := &Task{}
 
-	if err := ctx.BindJSON(&task_info); err != nil {
+	if err := ctx.BindJSON(task_info); err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

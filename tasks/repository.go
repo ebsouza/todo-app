@@ -6,6 +6,8 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
+
+	"time"
 )
 
 type repository struct {
@@ -27,44 +29,45 @@ func (r repository) AddTask(task *Task) error {
 	return nil
 }
 
-func (r repository) GetTask(task_id string) (Task, error) {
-	var task Task
+func (r repository) GetTask(task_id string) (*Task, error) {
+	task := &Task{}
 
-	if result := r.DB.First(&task, "id = ?", task_id); result.Error != nil {
-		return Task{}, errors.New("Task not found")
+	if result := r.DB.First(task, "id = ?", task_id); result.Error != nil {
+		return task, errors.New("Task not found")
 	}
 
 	return task, nil
 }
 
-func (r repository) GetAllTasks() ([]Task, error) {
-	var tasks []Task
+func (r repository) GetAllTasks() (*[]Task, error) {
+	tasks := &[]Task{}
 
-	if result := r.DB.Find(&tasks); result.Error != nil {
-		return []Task{}, errors.New("Tasks could not be recovered")
+	if result := r.DB.Find(tasks); result.Error != nil {
+		return tasks, errors.New("Tasks could not be recovered")
 	}
 
 	return tasks, nil
 }
 
-func (r repository) DeleteTask(task_id string) (Task, error) {
+func (r repository) DeleteTask(task_id string) (*Task, error) {
 	task, _ := r.GetTask(task_id)
 
-	if result := r.DB.Delete(&task); result.Error != nil {
+	if result := r.DB.Delete(task); result.Error != nil {
 		return task, errors.New("Tasks could not be removed")
 	}
 
 	return task, nil
 }
 
-func (r repository) UpdateTask(task_id string, task_info Task) (Task, error) {
+func (r repository) UpdateTask(task_id string, task_info *Task) (*Task, error) {
 	task, _ := r.GetTask(task_id)
 
 	task.Title = task_info.Title
 	task.Description = task_info.Description
 	task.Status = task_info.Status
+	task.UpdatedAt = time.Now()
 
-	if result := r.DB.Save(&task); result.Error != nil {
+	if result := r.DB.Save(task); result.Error != nil {
 		return task, errors.New("Tasks could not be updated")
 	}
 

@@ -11,7 +11,7 @@ func InitializeRouter(r *repository) *gin.Engine{
 	}
 
 	routes := router.Group("/tasks")
-	routes.POST("/", h.PostTasks)
+	routes.POST("/", h.PostTask)
 	routes.GET("/", h.GetTasks)
 	routes.GET("/:id", h.GetTaskByID)
     routes.PUT("/:id", h.UpdateTask)
