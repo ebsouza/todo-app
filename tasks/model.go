@@ -1,11 +1,10 @@
 package tasks
 
-import "gorm.io/gorm"
+import "todo/server/common/orm"
 
 type Task struct {
-	gorm.Model
-	ID          string `json:id`
-	Title       string `json:title`
-	Description string `json:description`
-	Status      string `json:status`
+	orm.Base
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Status      string `json:"status"`
 }

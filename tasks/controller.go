@@ -1,18 +1,21 @@
 package tasks
 
-import (
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
-)
+import "github.com/gin-gonic/gin"
 
-func RegisterRoutes(router *gin.Engine, db *gorm.DB) {
-	h := &handler{
-		DB: db,
+
+func InitializeRouter(r *repository) *gin.Engine{
+	router := gin.Default()
+    
+    h := &handler{
+		Repository: r,
 	}
 
 	routes := router.Group("/tasks")
-	routes.POST("/", h.PostTasks)
+	routes.POST("/", h.PostTask)
 	routes.GET("/", h.GetTasks)
 	routes.GET("/:id", h.GetTaskByID)
+    routes.PUT("/:id", h.UpdateTask)
 	routes.DELETE("/:id", h.RemoveTaskByID)
+
+    return router
 }
