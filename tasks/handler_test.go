@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"bytes"
+	"github.com/gin-gonic/gin"
 )
 
 type TaskPostRequest struct {
@@ -16,16 +17,25 @@ type TaskPostRequest struct {
 	description string
 }
 
-func TestCreateTask(t *testing.T) {
+
+func setupTestRouters() *gin.Engine {
 	dbHandler, _ := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	repository := NewRepository(dbHandler)
 	router := InitializeRouter(repository)
 
-	body, _ := json.Marshal(map[string]string{
+	return router
+}
+
+func TestCreateTask(t *testing.T) {
+	router := setupTestRouters()
+
+	data := map[string]string{
         "title": "X",
         "description": "Y",
 		"status": "OK",
-    })
+    }
+
+	body, _ := json.Marshal(data)
     payload := bytes.NewBuffer(body)
 	req, _ := http.NewRequest("POST", "/tasks/", payload)
 
@@ -36,9 +46,9 @@ func TestCreateTask(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &task)
 
 	assert.Equal(t, http.StatusCreated, w.Code)
-	assert.Equal(t, "X", task.Title)
-	assert.Equal(t, "Y", task.Description)
-	assert.Equal(t, "OK", task.Status)
+	assert.Equal(t, data["title"], task.Title)
+	assert.Equal(t, data["description"], task.Description)
+	assert.Equal(t, data["status"], task.Status)
 }
 
 
