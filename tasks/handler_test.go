@@ -18,16 +18,16 @@ type TaskPostRequest struct {
 }
 
 
-func setupTestRouters() *gin.Engine {
+func setupTestRouters() (*gin.Engine, *repository) {
 	dbHandler, _ := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	repository := NewRepository(dbHandler)
 	router := InitializeRouter(repository)
 
-	return router
+	return router, repository
 }
 
 func TestCreateTask(t *testing.T) {
-	router := setupTestRouters()
+	router, _ := setupTestRouters()
 
 	data := map[string]string{
         "title": "X",
@@ -49,6 +49,29 @@ func TestCreateTask(t *testing.T) {
 	assert.Equal(t, data["title"], task.Title)
 	assert.Equal(t, data["description"], task.Description)
 	assert.Equal(t, data["status"], task.Status)
+}
+
+
+func TestGetTask(t *testing.T) {
+	router, repository := setupTestRouters()
+
+	task := Task{Title: "X", Description: "Y", Status: "Z"}
+
+	repository.AddTask(&task)
+
+	req, _ := http.NewRequest("GET", "/tasks/", nil)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	//var task Task
+	//json.Unmarshal(w.Body.Bytes(), &task)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, "200", w.Body.String())
+	//assert.Equal(t, data["title"], task.Title)
+	//assert.Equal(t, data["description"], task.Description)
+	//assert.Equal(t, data["status"], task.Status)
 }
 
 
