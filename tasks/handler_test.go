@@ -40,6 +40,14 @@ func createTaskPayload(title, description, status string) *bytes.Buffer {
 	return payload
 }
 
+func newTask() *Task {
+	task := &Task{}
+	task.Title = "Title"
+	task.Description = "Description"
+	task.Status = "Status"
+	return task
+}
+
 func TestPostTask(t *testing.T) {
 	router, _ := setupTestRouters()
 
@@ -63,9 +71,9 @@ func TestGetTasks(t *testing.T) {
 	router, repository := setupTestRouters()
 	var numberOfTasks int = 3
 
-	for i := 0; i < numberOfTasks; i++ {
-		task := Task{Title: "A", Description: "B", Status: "C"}
-		repository.AddTask(&task)
+	task := newTask()
+	for i := 0; i < numberOfTasks; i++ {		
+		repository.AddTask(task)
 	}
 
 	req, _ := http.NewRequest("GET", "/tasks/", nil)
@@ -83,8 +91,8 @@ func TestGetTasks(t *testing.T) {
 func TestGetTaskByID(t *testing.T) {
 	router, repository := setupTestRouters()
 
-	task := Task{Title: "A", Description: "B", Status: "C"}
-	id, _ := repository.AddTask(&task)
+	task := newTask()
+	id, _ := repository.AddTask(task)
 
 	req, _ := http.NewRequest("GET", "/tasks/"+id.String(), nil)
 
@@ -105,8 +113,8 @@ func TestGetTaskByID(t *testing.T) {
 func TestRemoveTaskByID(t *testing.T) {
 	router, repository := setupTestRouters()
 
-	task := Task{Title: "A", Description: "B", Status: "C"}
-	id, _ := repository.AddTask(&task)
+	task := newTask()
+	id, _ := repository.AddTask(task)
 
 	req, _ := http.NewRequest("DELETE", "/tasks/"+id.String(), nil)
 
@@ -126,8 +134,8 @@ func TestRemoveTaskByID(t *testing.T) {
 func TestUpdateTask(t *testing.T) {
 	router, repository := setupTestRouters()
 
-	task := Task{Title: "A", Description: "B", Status: "C"}
-	id, _ := repository.AddTask(&task)
+	task := newTask()
+	id, _ := repository.AddTask(task)
 
 	title, description, status := "title", "description", "status"
 	payload := createTaskPayload(title, description, status)
