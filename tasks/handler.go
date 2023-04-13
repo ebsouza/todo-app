@@ -18,7 +18,7 @@ func (h handler) PostTask(ctx *gin.Context) {
 		return
 	}
 
-	err := h.Repository.AddTask(task)
+	_, err := h.Repository.AddTask(task)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
