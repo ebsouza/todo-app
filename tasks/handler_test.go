@@ -27,12 +27,12 @@ func setupTestRouters() (*gin.Engine, *repository) {
 	return router, repository
 }
 
-func TestCreateTask(t *testing.T) {
+func TestPostTask(t *testing.T) {
 	router, _ := setupTestRouters()
 
 	data := map[string]string{
-		"title":       "X",
-		"description": "Y",
+		"title":       "Some title",
+		"description": "Some description",
 		"status":      "OK",
 	}
 
@@ -73,7 +73,78 @@ func TestGetTasks(t *testing.T) {
 	assert.Equal(t, numberOfTasks, len(tasks))
 }
 
-//https://github.com/learning-go-book/test_examples/tree/master/solver
-//https://gin-gonic.com/docs/testing/
+func TestGetTaskByID(t *testing.T) {
+	router, repository := setupTestRouters()
 
-//https://pkg.go.dev/net/http/httptest#ResponseRecorder
+	task := Task{Title: "A", Description: "B", Status: "C"}
+	id, _ := repository.AddTask(&task)
+
+	req, _ := http.NewRequest("GET", "/tasks/"+id.String(), nil)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	var taskRecovered Task
+	json.Unmarshal(w.Body.Bytes(), &taskRecovered)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, task.ID, id)
+	assert.Equal(t, task.ID, taskRecovered.ID)
+	assert.Equal(t, task.Title, taskRecovered.Title)
+	assert.Equal(t, task.Description, taskRecovered.Description)
+	assert.Equal(t, task.Status, taskRecovered.Status)
+}
+
+func TestRemoveTaskByID(t *testing.T) {
+	router, repository := setupTestRouters()
+
+	task := Task{Title: "A", Description: "B", Status: "C"}
+	id, _ := repository.AddTask(&task)
+
+	req, _ := http.NewRequest("DELETE", "/tasks/"+id.String(), nil)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	var taskRemoved Task
+	json.Unmarshal(w.Body.Bytes(), &taskRemoved)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, task.ID, taskRemoved.ID)
+	assert.Equal(t, task.Title, taskRemoved.Title)
+	assert.Equal(t, task.Description, taskRemoved.Description)
+	assert.Equal(t, task.Status, taskRemoved.Status)
+}
+
+func TestUpdateTask(t *testing.T) {
+	router, repository := setupTestRouters()
+
+	task := Task{Title: "A", Description: "B", Status: "C"}
+	id, _ := repository.AddTask(&task)
+
+	data := map[string]string{
+		"title":       "X",
+		"description": "Y",
+		"status":      "Z",
+	}
+
+	body, _ := json.Marshal(data)
+	payload := bytes.NewBuffer(body)
+
+	req, _ := http.NewRequest("PUT", "/tasks/"+id.String(), payload)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	var taskUpdated Task
+	json.Unmarshal(w.Body.Bytes(), &taskUpdated)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, task.ID, taskUpdated.ID)
+	assert.Equal(t, data["title"], taskUpdated.Title)
+	assert.Equal(t, data["description"], taskUpdated.Description)
+	assert.Equal(t, data["status"], taskUpdated.Status)
+	assert.NotEqual(t, task.Title, taskUpdated.Title)
+	assert.NotEqual(t, task.Description, taskUpdated.Description)
+	assert.NotEqual(t, task.Status, taskUpdated.Status)
+}

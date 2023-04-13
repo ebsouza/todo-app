@@ -19,14 +19,14 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r repository) AddTask(task *Task) error {
+func (r repository) AddTask(task *Task) (uuid.UUID, error) {
 	task.ID = uuid.New()
 
 	if result := r.DB.Create(task); result.Error != nil {
-		return errors.New("Task could not be created")
+		return task.ID, errors.New("Task could not be created")
 	}
 
-	return nil
+	return task.ID, nil
 }
 
 func (r repository) GetTask(task_id string) (*Task, error) {
