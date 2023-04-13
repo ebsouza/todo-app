@@ -27,17 +27,24 @@ func setupTestRouters() (*gin.Engine, *repository) {
 	return router, repository
 }
 
-func TestPostTask(t *testing.T) {
-	router, _ := setupTestRouters()
-
+func createTaskPayload(title, description, status string) *bytes.Buffer {
 	data := map[string]string{
-		"title":       "Some title",
-		"description": "Some description",
-		"status":      "OK",
+		"title":       title,
+		"description": description,
+		"status":      status,
 	}
 
 	body, _ := json.Marshal(data)
 	payload := bytes.NewBuffer(body)
+
+	return payload
+}
+
+func TestPostTask(t *testing.T) {
+	router, _ := setupTestRouters()
+
+	title, description, status := "title", "description", "status"
+	payload := createTaskPayload(title, description, status)
 	req, _ := http.NewRequest("POST", "/tasks/", payload)
 
 	w := httptest.NewRecorder()
@@ -47,9 +54,9 @@ func TestPostTask(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &task)
 
 	assert.Equal(t, http.StatusCreated, w.Code)
-	assert.Equal(t, data["title"], task.Title)
-	assert.Equal(t, data["description"], task.Description)
-	assert.Equal(t, data["status"], task.Status)
+	assert.Equal(t, title, task.Title)
+	assert.Equal(t, description, task.Description)
+	assert.Equal(t, status, task.Status)
 }
 
 func TestGetTasks(t *testing.T) {
@@ -122,14 +129,8 @@ func TestUpdateTask(t *testing.T) {
 	task := Task{Title: "A", Description: "B", Status: "C"}
 	id, _ := repository.AddTask(&task)
 
-	data := map[string]string{
-		"title":       "X",
-		"description": "Y",
-		"status":      "Z",
-	}
-
-	body, _ := json.Marshal(data)
-	payload := bytes.NewBuffer(body)
+	title, description, status := "title", "description", "status"
+	payload := createTaskPayload(title, description, status)
 
 	req, _ := http.NewRequest("PUT", "/tasks/"+id.String(), payload)
 
@@ -141,9 +142,9 @@ func TestUpdateTask(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, task.ID, taskUpdated.ID)
-	assert.Equal(t, data["title"], taskUpdated.Title)
-	assert.Equal(t, data["description"], taskUpdated.Description)
-	assert.Equal(t, data["status"], taskUpdated.Status)
+	assert.Equal(t, title, taskUpdated.Title)
+	assert.Equal(t, description, taskUpdated.Description)
+	assert.Equal(t, status, taskUpdated.Status)
 	assert.NotEqual(t, task.Title, taskUpdated.Title)
 	assert.NotEqual(t, task.Description, taskUpdated.Description)
 	assert.NotEqual(t, task.Status, taskUpdated.Status)
