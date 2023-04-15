@@ -60,7 +60,11 @@ func (r repository) DeleteTask(task_id string) (*Task, error) {
 }
 
 func (r repository) UpdateTask(task_id string, task_info *Task) (*Task, error) {
-	task, _ := r.GetTask(task_id)
+	task, err := r.GetTask(task_id)
+
+	if err != nil {
+		return &Task{}, errors.New("Task not found")
+	}
 
 	task.Title = task_info.Title
 	task.Description = task_info.Description

@@ -110,6 +110,17 @@ func TestGetTaskByID(t *testing.T) {
 	assert.Equal(t, task.Status, taskRecovered.Status)
 }
 
+func TestGetTaskByIDNotFound(t *testing.T) {
+	router, _ := setupTestRouters()
+
+	req, _ := http.NewRequest("GET", "/tasks/"+"unexistent id", nil)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+
 func TestRemoveTaskByID(t *testing.T) {
 	router, repository := setupTestRouters()
 
@@ -129,6 +140,17 @@ func TestRemoveTaskByID(t *testing.T) {
 	assert.Equal(t, task.Title, taskRemoved.Title)
 	assert.Equal(t, task.Description, taskRemoved.Description)
 	assert.Equal(t, task.Status, taskRemoved.Status)
+}
+
+func TestRemoveTaskByIDNotFound(t *testing.T) {
+	router, _ := setupTestRouters()
+
+	req, _ := http.NewRequest("DELETE", "/tasks/"+"unexistent id", nil)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
 }
 
 func TestUpdateTask(t *testing.T) {
@@ -156,4 +178,18 @@ func TestUpdateTask(t *testing.T) {
 	assert.NotEqual(t, task.Title, taskUpdated.Title)
 	assert.NotEqual(t, task.Description, taskUpdated.Description)
 	assert.NotEqual(t, task.Status, taskUpdated.Status)
+}
+
+func TestUpdateTaskNotFound(t *testing.T) {
+	router, _ := setupTestRouters()
+
+	title, description, status := "title", "description", "status"
+	payload := createTaskPayload(title, description, status)
+
+	req, _ := http.NewRequest("PUT", "/tasks/"+"unexistent id", payload)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
 }
