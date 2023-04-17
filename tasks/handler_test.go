@@ -28,11 +28,7 @@ func setupTestRouters() (*gin.Engine, *repository) {
 }
 
 func createTaskPayload(title, description, status string) *bytes.Buffer {
-	data := map[string]string{
-		"title":       title,
-		"description": description,
-		"status":      status,
-	}
+	data := TaskData{Title: title, Description: description, Status: status}
 
 	body, _ := json.Marshal(data)
 	payload := bytes.NewBuffer(body)
@@ -40,18 +36,10 @@ func createTaskPayload(title, description, status string) *bytes.Buffer {
 	return payload
 }
 
-func newTask() *Task {
-	task := &Task{}
-	task.Title = "Title"
-	task.Description = "Description"
-	task.Status = "Status"
-	return task
-}
-
 func TestPostTask(t *testing.T) {
 	router, _ := setupTestRouters()
 
-	title, description, status := "title", "description", "status"
+	title, description, status := "title", "description", "not used"
 	payload := createTaskPayload(title, description, status)
 	req, _ := http.NewRequest("POST", "/tasks/", payload)
 
@@ -64,15 +52,15 @@ func TestPostTask(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.Equal(t, title, task.Title)
 	assert.Equal(t, description, task.Description)
-	assert.Equal(t, status, task.Status)
+	assert.Equal(t, StatusDefault, task.Status)
 }
 
 func TestGetTasks(t *testing.T) {
 	router, repository := setupTestRouters()
 	var numberOfTasks int = 3
 
-	task := newTask()
-	for i := 0; i < numberOfTasks; i++ {		
+	for i := 0; i < numberOfTasks; i++ {
+		task := NewTask()
 		repository.AddTask(task)
 	}
 
@@ -91,7 +79,7 @@ func TestGetTasks(t *testing.T) {
 func TestGetTaskByID(t *testing.T) {
 	router, repository := setupTestRouters()
 
-	task := newTask()
+	task := NewTask()
 	id, _ := repository.AddTask(task)
 
 	req, _ := http.NewRequest("GET", "/tasks/"+id.String(), nil)
@@ -124,7 +112,7 @@ func TestGetTaskByIDNotFound(t *testing.T) {
 func TestRemoveTaskByID(t *testing.T) {
 	router, repository := setupTestRouters()
 
-	task := newTask()
+	task := NewTask()
 	id, _ := repository.AddTask(task)
 
 	req, _ := http.NewRequest("DELETE", "/tasks/"+id.String(), nil)
@@ -156,7 +144,7 @@ func TestRemoveTaskByIDNotFound(t *testing.T) {
 func TestUpdateTask(t *testing.T) {
 	router, repository := setupTestRouters()
 
-	task := newTask()
+	task := NewTask()
 	id, _ := repository.AddTask(task)
 
 	title, description, status := "title", "description", "status"

@@ -11,12 +11,15 @@ type handler struct {
 }
 
 func (h handler) PostTask(ctx *gin.Context) {
-	task := &Task{}
+	data := TaskData{}
 
-	if err := ctx.BindJSON(task); err != nil {
+	if err := ctx.BindJSON(&data); err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	task := NewTask()
+	task.AddData(data)
 
 	_, err := h.Repository.AddTask(task)
 	if err != nil {
