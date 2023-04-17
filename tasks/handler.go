@@ -69,14 +69,14 @@ func (h handler) RemoveTaskByID(ctx *gin.Context) {
 
 func (h handler) UpdateTask(ctx *gin.Context) {
 	id := ctx.Param("id")
-	taskData := &TaskData{}
+	data := &TaskData{}
 
-	if err := ctx.BindJSON(taskData); err != nil {
+	if err := ctx.BindJSON(data); err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	task, err := h.Repository.UpdateTask(id, taskData)
+	task, err := h.Repository.UpdateTask(id, data)
 
 	if err != nil {
 		ctx.IndentedJSON(http.StatusNotFound, gin.H{"error": err.Error()})

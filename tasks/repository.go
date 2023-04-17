@@ -27,10 +27,10 @@ func (r repository) AddTask(task *Task) (uuid.UUID, error) {
 	return task.ID, nil
 }
 
-func (r repository) GetTask(task_id string) (*Task, error) {
+func (r repository) GetTask(id string) (*Task, error) {
 	task := &Task{}
 
-	if result := r.DB.First(task, "id = ?", task_id); result.Error != nil {
+	if result := r.DB.First(task, "id = ?", id); result.Error != nil {
 		return task, errors.New("Task not found")
 	}
 
@@ -47,8 +47,8 @@ func (r repository) GetAllTasks() (*[]Task, error) {
 	return tasks, nil
 }
 
-func (r repository) DeleteTask(task_id string) (*Task, error) {
-	task, _ := r.GetTask(task_id)
+func (r repository) DeleteTask(id string) (*Task, error) {
+	task, _ := r.GetTask(id)
 
 	if result := r.DB.Delete(task); result.Error != nil {
 		return task, errors.New("Tasks could not be removed")
@@ -57,16 +57,16 @@ func (r repository) DeleteTask(task_id string) (*Task, error) {
 	return task, nil
 }
 
-func (r repository) UpdateTask(task_id string, taskData *TaskData) (*Task, error) {
-	task, err := r.GetTask(task_id)
+func (r repository) UpdateTask(id string, data *TaskData) (*Task, error) {
+	task, err := r.GetTask(id)
 
 	if err != nil {
 		return &Task{}, errors.New("Task not found")
 	}
 
-	task.Title = taskData.Title
-	task.Description = taskData.Description
-	task.Status = taskData.Status
+	task.Title = data.Title
+	task.Description = data.Description
+	task.Status = data.Status
 	task.UpdatedAt = time.Now()
 
 	if result := r.DB.Save(task); result.Error != nil {
