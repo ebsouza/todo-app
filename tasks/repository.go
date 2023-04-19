@@ -48,10 +48,14 @@ func (r repository) GetAllTasks() (*[]Task, error) {
 }
 
 func (r repository) DeleteTask(id string) (*Task, error) {
-	task, _ := r.GetTask(id)
+	task, err := r.GetTask(id)
+
+	if err != nil {
+		return &Task{}, errors.New("Task not found")
+	}
 
 	if result := r.DB.Delete(task); result.Error != nil {
-		return task, errors.New("Tasks could not be removed")
+		return task, errors.New("Task could not be removed")
 	}
 
 	return task, nil
