@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 	"net/http"
 	"net/http/httptest"
-	"os"
+	//"os"
 	"testing"
 )
 
@@ -18,13 +18,16 @@ type TaskPostRequest struct {
 	description string
 }
 
-func setupTestRouters() (*gin.Engine, *repository) {
-	os.Remove("test.db")
+func setupTestRouters() (*gin.Engine, *repository, *gorm.DB) {
 	dbHandler, _ := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	repository := NewRepository(dbHandler)
 	router := InitializeRouter(repository)
 
-	return router, repository
+	return router, repository, dbHandler
+}
+
+func closeDB(db *gorm.DB) {
+	db.Exec("DELETE FROM tasks")
 }
 
 func createTaskPayload(title, description, status string) *bytes.Buffer {
@@ -37,7 +40,8 @@ func createTaskPayload(title, description, status string) *bytes.Buffer {
 }
 
 func TestPostTask(t *testing.T) {
-	router, _ := setupTestRouters()
+	router, _, dbHandler := setupTestRouters()
+	defer closeDB(dbHandler)
 
 	title, description, status := "title", "description", "not used"
 	payload := createTaskPayload(title, description, status)
@@ -55,8 +59,11 @@ func TestPostTask(t *testing.T) {
 	assert.Equal(t, StatusDefault, task.Status)
 }
 
+
 func TestGetTasks(t *testing.T) {
-	router, repository := setupTestRouters()
+	router, repository, dbHandler := setupTestRouters()
+	defer closeDB(dbHandler)
+
 	var numberOfTasks int = 3
 
 	for i := 0; i < numberOfTasks; i++ {
@@ -77,7 +84,8 @@ func TestGetTasks(t *testing.T) {
 }
 
 func TestGetTaskByID(t *testing.T) {
-	router, repository := setupTestRouters()
+	router, repository, dbHandler := setupTestRouters()
+	defer closeDB(dbHandler)
 
 	task := NewTask()
 	id, _ := repository.AddTask(task)
@@ -99,7 +107,8 @@ func TestGetTaskByID(t *testing.T) {
 }
 
 func TestGetTaskByIDNotFound(t *testing.T) {
-	router, _ := setupTestRouters()
+	router, _, dbHandler := setupTestRouters()
+	defer closeDB(dbHandler)
 
 	req, _ := http.NewRequest("GET", "/tasks/"+"unexistent id", nil)
 
@@ -110,7 +119,8 @@ func TestGetTaskByIDNotFound(t *testing.T) {
 }
 
 func TestRemoveTaskByID(t *testing.T) {
-	router, repository := setupTestRouters()
+	router, repository, dbHandler := setupTestRouters()
+	defer closeDB(dbHandler)
 
 	task := NewTask()
 	id, _ := repository.AddTask(task)
@@ -131,7 +141,8 @@ func TestRemoveTaskByID(t *testing.T) {
 }
 
 func TestRemoveTaskByIDNotFound(t *testing.T) {
-	router, _ := setupTestRouters()
+	router, _, dbHandler := setupTestRouters()
+	defer closeDB(dbHandler)
 
 	req, _ := http.NewRequest("DELETE", "/tasks/"+"unexistent id", nil)
 
@@ -142,7 +153,8 @@ func TestRemoveTaskByIDNotFound(t *testing.T) {
 }
 
 func TestUpdateTask(t *testing.T) {
-	router, repository := setupTestRouters()
+	router, repository, dbHandler := setupTestRouters()
+	defer closeDB(dbHandler)
 
 	task := NewTask()
 	id, _ := repository.AddTask(task)
@@ -169,7 +181,8 @@ func TestUpdateTask(t *testing.T) {
 }
 
 func TestUpdateTaskNotFound(t *testing.T) {
-	router, _ := setupTestRouters()
+	router, _, dbHandler := setupTestRouters()
+	defer closeDB(dbHandler)
 
 	title, description, status := "title", "description", "status"
 	payload := createTaskPayload(title, description, status)
