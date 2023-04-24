@@ -47,7 +47,8 @@ func (rs *RepositorySuite) TestGetAllTasks() {
 	}
 
 	limit, offset := 10, 0
-	tasks, err := rs.repository.GetAllTasks(limit, offset)
+	status := ""
+	tasks, err := rs.repository.GetAllTasks(limit, offset, status)
 	
 	assert.NoError(rs.T(), err)
 	assert.Equal(rs.T(), numberOfTasks, len(tasks))

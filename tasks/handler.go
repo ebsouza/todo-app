@@ -35,8 +35,9 @@ func (h handler) PostTask(ctx *gin.Context) {
 func (h handler) GetTasks(ctx *gin.Context) {
 	limit, _ :=  strconv.Atoi(ctx.DefaultQuery("limit", "100"))
 	offset, _ := strconv.Atoi(ctx.DefaultQuery("offset", "0"))
+	status := ctx.DefaultQuery("status", "")
 	
-	tasks, err := h.Repository.GetAllTasks(limit, offset)
+	tasks, err := h.Repository.GetAllTasks(limit, offset, status)
 
 	if err != nil {
 		ctx.IndentedJSON(http.StatusNotFound, gin.H{"error": err.Error()})
