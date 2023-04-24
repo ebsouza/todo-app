@@ -22,7 +22,7 @@ curl localhost:8080/tasks/<task_id>
 
 **GET:** /tasks
 ```
-curl localhost:8080/tasks
+curl "localhost:8080/tasks?limit=<limit>&offset=<offset>&status=<Task.status>"
 ```
 
 **POST:** /tasks
