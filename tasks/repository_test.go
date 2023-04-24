@@ -49,7 +49,7 @@ func (rs *RepositorySuite) TestGetAllTasks() {
 	tasks, err := rs.repository.GetAllTasks()
 	
 	assert.NoError(rs.T(), err)
-	assert.Equal(rs.T(), numberOfTasks, len(*tasks))
+	assert.Equal(rs.T(), numberOfTasks, len(tasks))
 }
 
 func (rs *RepositorySuite) TestDeleteTask() {
