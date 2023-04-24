@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"strconv"
 )
 
 type handler struct {
@@ -31,7 +33,8 @@ func (h handler) PostTask(ctx *gin.Context) {
 }
 
 func (h handler) GetTasks(ctx *gin.Context) {
-	limit, offset := 100, 0
+	limit, _ :=  strconv.Atoi(ctx.DefaultQuery("limit", "100"))
+	offset, _ := strconv.Atoi(ctx.DefaultQuery("offset", "0"))
 	
 	tasks, err := h.Repository.GetAllTasks(limit, offset)
 

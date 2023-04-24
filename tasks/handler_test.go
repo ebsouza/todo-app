@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 )
 
@@ -74,6 +75,28 @@ func (rs *RepositorySuite) TestGetTasks() {
 
 	assert.Equal(rs.T(), http.StatusOK, w.Code)
 	assert.Equal(rs.T(), numberOfTasks, len(tasks))
+}
+
+func (rs *RepositorySuite) TestGetTasksLimitOffset() {
+	var numberOfTasks int = 5
+
+	for i := 0; i < numberOfTasks; i++ {
+		task := NewTask()
+		rs.repository.AddTask(task)
+	}
+
+	limit, offset := "2", "2"
+	limit_integer, _ := strconv.Atoi(limit)
+	req, _ := http.NewRequest("GET", "/tasks/?limit=" + limit + "&offset=" + offset, nil)
+
+	w := httptest.NewRecorder()
+	rs.router.ServeHTTP(w, req)
+
+	var tasks []Task
+	json.Unmarshal(w.Body.Bytes(), &tasks)
+
+	assert.Equal(rs.T(), http.StatusOK, w.Code)
+	assert.Equal(rs.T(), limit_integer, len(tasks))
 }
 
 func (rs *RepositorySuite) TestGetTaskByID() {
