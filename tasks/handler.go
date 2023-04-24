@@ -82,6 +82,11 @@ func (h handler) UpdateTask(ctx *gin.Context) {
 		return
 	}
 
+	if !IsValidStatus(data.Status) {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid status"})
+		return
+	} 
+
 	task, err := h.Repository.UpdateTask(id, data)
 
 	if err != nil {

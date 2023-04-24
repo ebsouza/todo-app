@@ -160,7 +160,7 @@ func (rs *RepositorySuite) TestUpdateTask() {
 	task := NewTask()
 	id, _ := rs.repository.AddTask(task)
 
-	title, description, status := "title", "description", "status"
+	title, description, status := "title", "description", allStatus()[1]
 	payload := createTaskPayload(title, description, status)
 
 	req, _ := http.NewRequest("PUT", "/tasks/"+id.String(), payload)
@@ -181,8 +181,26 @@ func (rs *RepositorySuite) TestUpdateTask() {
 	assert.NotEqual(rs.T(), task.Status, taskUpdated.Status)
 }
 
-func (rs *RepositorySuite) TestUpdateTaskNotFound() {
+func (rs *RepositorySuite) TestUpdateTaskInvalidStatus() {
+	task := NewTask()
+	id, _ := rs.repository.AddTask(task)
+
 	title, description, status := "title", "description", "status"
+	payload := createTaskPayload(title, description, status)
+
+	req, _ := http.NewRequest("PUT", "/tasks/"+id.String(), payload)
+
+	w := httptest.NewRecorder()
+	rs.router.ServeHTTP(w, req)
+
+	var taskUpdated Task
+	json.Unmarshal(w.Body.Bytes(), &taskUpdated)
+
+	assert.Equal(rs.T(), http.StatusBadRequest, w.Code)
+}
+
+func (rs *RepositorySuite) TestUpdateTaskNotFound() {
+	title, description, status := "title", "description", StatusDefault
 	payload := createTaskPayload(title, description, status)
 
 	req, _ := http.NewRequest("PUT", "/tasks/"+"unexistent id", payload)

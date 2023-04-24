@@ -5,7 +5,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const StatusDefault = "STARTED"
+const StatusDefault = "CREATED"
 
 type Task struct {
 	orm.Base
@@ -30,4 +30,18 @@ func NewTask() *Task {
 	task.ID = uuid.New()
 	task.Status = StatusDefault
 	return task
+}
+
+func allStatus() []string {
+	return []string{StatusDefault, "IN_PROGRESS", "DONE"}
+}
+
+func IsValidStatus(status string) bool {
+    allStatus := allStatus()
+	for _, validStatus := range allStatus {
+        if status == validStatus {
+            return true
+        }
+    }
+    return false
 }
