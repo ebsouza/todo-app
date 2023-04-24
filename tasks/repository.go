@@ -37,10 +37,10 @@ func (r repository) GetTask(id string) (*Task, error) {
 	return task, nil
 }
 
-func (r repository) GetAllTasks() ([]Task, error) {
+func (r repository) GetAllTasks(limit int, offset int) ([]Task, error) {
 	tasks := []Task{}
 
-	if result := r.DB.Find(&tasks); result.Error != nil {
+	if result := r.DB.Limit(limit).Offset(offset).Find(&tasks); result.Error != nil {
 		return tasks, errors.New("Tasks could not be recovered")
 	}
 

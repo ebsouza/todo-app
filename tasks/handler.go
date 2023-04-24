@@ -31,7 +31,9 @@ func (h handler) PostTask(ctx *gin.Context) {
 }
 
 func (h handler) GetTasks(ctx *gin.Context) {
-	tasks, err := h.Repository.GetAllTasks()
+	limit, offset := 100, 0
+	
+	tasks, err := h.Repository.GetAllTasks(limit, offset)
 
 	if err != nil {
 		ctx.IndentedJSON(http.StatusNotFound, gin.H{"error": err.Error()})
