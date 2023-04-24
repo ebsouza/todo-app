@@ -22,12 +22,12 @@ curl localhost:8080/tasks/<task_id>
 
 **GET:** /tasks
 ```
-curl localhost:8080/tasks/
+curl localhost:8080/tasks
 ```
 
 **POST:** /tasks
 ```
-curl -X POST localhost:8080/tasks/ -H 'Content-Type: application/json'  -d '{"title": "Hard Task", "description":"Do something", "status": "OK"}'
+curl -X POST localhost:8080/tasks -H 'Content-Type: application/json'  -d '{"title": "Hard Task", "description":"Do something"}'
 ```
 
 **UPDATE:** /tasks/id

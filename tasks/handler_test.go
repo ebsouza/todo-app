@@ -43,7 +43,7 @@ func createTaskPayload(title, description, status string) *bytes.Buffer {
 func (rs *RepositorySuite) TestPostTask() {
 	title, description, status := "title", "description", "not used"
 	payload := createTaskPayload(title, description, status)
-	req, _ := http.NewRequest("POST", "/tasks/", payload)
+	req, _ := http.NewRequest("POST", "/tasks", payload)
 
 	w := httptest.NewRecorder()
 	rs.router.ServeHTTP(w, req)
@@ -65,7 +65,7 @@ func (rs *RepositorySuite) TestGetTasks() {
 		rs.repository.AddTask(task)
 	}
 
-	req, _ := http.NewRequest("GET", "/tasks/", nil)
+	req, _ := http.NewRequest("GET", "/tasks", nil)
 
 	w := httptest.NewRecorder()
 	rs.router.ServeHTTP(w, req)
@@ -87,7 +87,7 @@ func (rs *RepositorySuite) TestGetTasksLimitOffset() {
 
 	limit, offset := "2", "2"
 	limit_integer, _ := strconv.Atoi(limit)
-	req, _ := http.NewRequest("GET", "/tasks/?limit=" + limit + "&offset=" + offset, nil)
+	req, _ := http.NewRequest("GET", "/tasks?limit=" + limit + "&offset=" + offset, nil)
 
 	w := httptest.NewRecorder()
 	rs.router.ServeHTTP(w, req)
