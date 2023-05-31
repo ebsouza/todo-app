@@ -1,9 +1,9 @@
 package main
 
 import (
-	"todo/server/tasks"
+	"github.com/ebsouza/todo-app/tasks"
 
-	"todo/server/common/db"
+	"github.com/ebsouza/todo-app/common/db"
 )
 
 func main() {

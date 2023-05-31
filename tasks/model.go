@@ -1,7 +1,7 @@
 package tasks
 
 import (
-	"todo/server/common/orm"
+	"github.com/ebsouza/todo-app/common/orm"
 	"github.com/google/uuid"
 )
 
