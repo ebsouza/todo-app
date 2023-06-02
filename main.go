@@ -1,10 +1,13 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
+
 	"github.com/ebsouza/todo-app/tasks"
 
 	"github.com/ebsouza/todo-app/common/db"
 )
+
 
 func main() {
 
@@ -12,7 +15,8 @@ func main() {
 	dbHandler := db.Init(dbUrl)
 
 	repository := tasks.NewRepository(dbHandler)
-	router := tasks.InitializeRouter(repository)
+	router := gin.Default()
+	tasks.AddRouterGroup(router, repository)
 
 	router.Run()
 }

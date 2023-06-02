@@ -3,9 +3,7 @@ package tasks
 import "github.com/gin-gonic/gin"
 
 
-func InitializeRouter(r *repository) *gin.Engine{
-	router := gin.Default()
-    
+func AddRouterGroup(router *gin.Engine, r *repository) {    
     h := &handler{
 		Repository: r,
 	}
@@ -16,6 +14,4 @@ func InitializeRouter(r *repository) *gin.Engine{
 	routes.GET("/:id", h.GetTaskByID)
     routes.PUT("/:id", h.UpdateTask)
 	routes.DELETE("/:id", h.RemoveTaskByID)
-
-    return router
 }

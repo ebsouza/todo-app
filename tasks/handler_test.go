@@ -24,7 +24,8 @@ type RepositorySuite struct {
 func (rs *RepositorySuite) SetupSuite() {
 	rs.dbHandler, _ = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	rs.repository = NewRepository(rs.dbHandler)
-	rs.router = InitializeRouter(rs.repository)
+	rs.router = gin.Default()
+	AddRouterGroup(rs.router, rs.repository)
 }
 
 func (rs *RepositorySuite) AfterTest(_, _ string) {
