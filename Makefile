@@ -1,5 +1,6 @@
 dependencies:
 	rm -f go.sum go.mod
+	
 	go mod init github.com/ebsouza/todo-app
 
 	go get github.com/gin-gonic/gin@v1.9.0
@@ -12,10 +13,10 @@ dependencies:
 	go get -t github.com/ebsouza/todo-app/tasks
 
 docker-build: dependencies
-	docker-compose up --force-recreate
+	docker compose create --force-recreate
 
 docker-run:
-	docker-compose up --force-recreate
+	docker compose up
 
 test:
 	go test ./...

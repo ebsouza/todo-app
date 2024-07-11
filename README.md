@@ -5,12 +5,17 @@ This project was written in Go language and it has Gin and GORM as essential par
 The app features are very basic. However, it shows how everything work together.
 
 
-### Running
+### Building & Running
 
 ```
-docker-compose up
+make docker-build
+
+make docker-run
 ```
 
+#### Docker version
+- Docker version 27.0.3
+- Docker compose version v2.28.1
 
 ### CURL
 
@@ -22,7 +27,7 @@ curl localhost:8080/tasks/<task_id>
 
 **GET:** /tasks
 ```
-curl "localhost:8080/tasks?limit=<limit>&offset=<offset>&status=<Task.status>"
+curl localhost:8080/tasks?limit=<limit>&offset=<offset>&status=<Task.status>
 ```
 
 **POST:** /tasks
