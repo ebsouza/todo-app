@@ -1,11 +1,15 @@
 package tasks
 
 import (
+	"slices"
+
 	"github.com/ebsouza/todo-app/internal/common/orm"
 	"github.com/google/uuid"
 )
 
-const StatusDefault = "CREATED"
+const statusDefault string = "CREATED"
+
+var allStatus []string = []string{statusDefault, "IN_PROGRESS", "DONE"}
 
 type Task struct {
 	orm.Base
@@ -28,20 +32,10 @@ type TaskData struct {
 func NewTask() *Task {
 	task := &Task{}
 	task.ID = uuid.New()
-	task.Status = StatusDefault
+	task.Status = statusDefault
 	return task
 }
 
-func allStatus() []string {
-	return []string{StatusDefault, "IN_PROGRESS", "DONE"}
-}
-
 func IsValidStatus(status string) bool {
-	allStatus := allStatus()
-	for _, validStatus := range allStatus {
-		if status == validStatus {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(allStatus, status)
 }

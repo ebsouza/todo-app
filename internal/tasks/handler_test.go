@@ -3,15 +3,16 @@ package tasks
 import (
 	"bytes"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"strconv"
+	"testing"
+
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"net/http"
-	"net/http/httptest"
-	"strconv"
-	"testing"
 )
 
 type RepositorySuite struct {
@@ -55,7 +56,7 @@ func (rs *RepositorySuite) TestPostTask() {
 	assert.Equal(rs.T(), http.StatusCreated, w.Code)
 	assert.Equal(rs.T(), title, task.Title)
 	assert.Equal(rs.T(), description, task.Description)
-	assert.Equal(rs.T(), StatusDefault, task.Status)
+	assert.Equal(rs.T(), statusDefault, task.Status)
 }
 
 func (rs *RepositorySuite) TestGetTasks() {
@@ -88,7 +89,7 @@ func (rs *RepositorySuite) TestGetTasksLimitOffset() {
 
 	limit, offset := "2", "2"
 	limit_integer, _ := strconv.Atoi(limit)
-	req, _ := http.NewRequest("GET", "/tasks?limit=" + limit + "&offset=" + offset, nil)
+	req, _ := http.NewRequest("GET", "/tasks?limit="+limit+"&offset="+offset, nil)
 
 	w := httptest.NewRecorder()
 	rs.router.ServeHTTP(w, req)
@@ -161,7 +162,7 @@ func (rs *RepositorySuite) TestUpdateTask() {
 	task := NewTask()
 	id, _ := rs.repository.AddTask(task)
 
-	title, description, status := "title", "description", allStatus()[1]
+	title, description, status := "title", "description", allStatus[1]
 	payload := createTaskPayload(title, description, status)
 
 	req, _ := http.NewRequest("PUT", "/tasks/"+id.String(), payload)
@@ -201,7 +202,7 @@ func (rs *RepositorySuite) TestUpdateTaskInvalidStatus() {
 }
 
 func (rs *RepositorySuite) TestUpdateTaskNotFound() {
-	title, description, status := "title", "description", StatusDefault
+	title, description, status := "title", "description", statusDefault
 	payload := createTaskPayload(title, description, status)
 
 	req, _ := http.NewRequest("PUT", "/tasks/"+"unexistent id", payload)
