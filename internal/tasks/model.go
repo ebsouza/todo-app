@@ -1,7 +1,7 @@
 package tasks
 
 import (
-	"github.com/ebsouza/todo-app/common/orm"
+	"github.com/ebsouza/todo-app/internal/common/orm"
 	"github.com/google/uuid"
 )
 
@@ -37,11 +37,11 @@ func allStatus() []string {
 }
 
 func IsValidStatus(status string) bool {
-    allStatus := allStatus()
+	allStatus := allStatus()
 	for _, validStatus := range allStatus {
-        if status == validStatus {
-            return true
-        }
-    }
-    return false
+		if status == validStatus {
+			return true
+		}
+	}
+	return false
 }

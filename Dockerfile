@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /webserver
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /webserver cmd/api/main.go
 
 FROM gcr.io/distroless/static-debian11
 

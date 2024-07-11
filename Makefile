@@ -10,7 +10,7 @@ dependencies:
 	go get gorm.io/driver/sqlite@v1.5.1
 	go get gorm.io/gorm@v1.25.1
 	
-	go get -t github.com/ebsouza/todo-app/tasks
+	go get -t github.com/ebsouza/todo-app/internal/tasks
 
 docker-build: dependencies
 	docker compose create --force-recreate

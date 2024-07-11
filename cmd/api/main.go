@@ -3,11 +3,10 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/ebsouza/todo-app/tasks"
+	"github.com/ebsouza/todo-app/internal/tasks"
 
-	"github.com/ebsouza/todo-app/common/db"
+	"github.com/ebsouza/todo-app/internal/common/db"
 )
-
 
 func main() {
 
