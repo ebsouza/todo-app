@@ -34,7 +34,7 @@ func (rs *RepositorySuite) AfterTest(_, _ string) {
 }
 
 func createTaskPayload(title, description, status string) *bytes.Buffer {
-	data := TaskData{Title: title, Description: description, Status: status}
+	data := TaskSchemaIn{Title: title, Description: description, Status: status}
 
 	body, _ := json.Marshal(data)
 	payload := bytes.NewBuffer(body)
@@ -56,7 +56,7 @@ func (rs *RepositorySuite) TestPostTask() {
 	assert.Equal(rs.T(), http.StatusCreated, w.Code)
 	assert.Equal(rs.T(), title, task.Title)
 	assert.Equal(rs.T(), description, task.Description)
-	assert.Equal(rs.T(), statusDefault, task.Status)
+	assert.Equal(rs.T(), statusName[Created], task.Status)
 }
 
 func (rs *RepositorySuite) TestGetTasks() {
@@ -162,7 +162,7 @@ func (rs *RepositorySuite) TestUpdateTask() {
 	task := NewTask()
 	id, _ := rs.repository.AddTask(task)
 
-	title, description, status := "title", "description", allStatus[1]
+	title, description, status := "title", "description", statusName[InProgress]
 	payload := createTaskPayload(title, description, status)
 
 	req, _ := http.NewRequest("PUT", "/tasks/"+id.String(), payload)
@@ -202,7 +202,7 @@ func (rs *RepositorySuite) TestUpdateTaskInvalidStatus() {
 }
 
 func (rs *RepositorySuite) TestUpdateTaskNotFound() {
-	title, description, status := "title", "description", statusDefault
+	title, description, status := "title", "description", statusName[Created]
 	payload := createTaskPayload(title, description, status)
 
 	req, _ := http.NewRequest("PUT", "/tasks/"+"unexistent id", payload)

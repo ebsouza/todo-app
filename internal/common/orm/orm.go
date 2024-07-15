@@ -1,12 +1,13 @@
 package orm
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Base struct {
-	ID        uuid.UUID `gorm:"type:uuid;primary_key;" json:"id"`
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
+	ID        uuid.UUID `gorm:"type:uuid;primary_key;"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

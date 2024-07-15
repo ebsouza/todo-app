@@ -61,20 +61,20 @@ func (r repository) DeleteTask(id string) (*Task, error) {
 	return task, nil
 }
 
-func (r repository) UpdateTask(id string, data *TaskData) (*Task, error) {
+func (r repository) UpdateTask(id string, title string, description string, status string) (*Task, error) {
 	task, err := r.GetTask(id)
 
 	if err != nil {
 		return &Task{}, errors.New("Task not found")
 	}
 
-	task.Title = data.Title
-	task.Description = data.Description
-	task.Status = data.Status
+	task.Title = title
+	task.Description = description
+	task.Status = status
 	task.UpdatedAt = time.Now()
 
 	if result := r.DB.Save(task); result.Error != nil {
-		return task, errors.New("Tasks could not be updated")
+		return task, errors.New("tasks could not be updated")
 	}
 
 	return task, nil

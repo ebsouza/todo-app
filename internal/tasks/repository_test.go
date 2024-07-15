@@ -4,14 +4,13 @@ import "github.com/stretchr/testify/assert"
 
 func NewTaskTest() *Task {
 	task := NewTask()
-	data := TaskData{Title: "title", Description: "description"}
-	task.AddData(data)
+	task.AddData("title", "description")
 	return task
 }
 
 func (rs *RepositorySuite) TestAddTask() {
 	task := NewTaskTest()
-	
+
 	_, err := rs.repository.AddTask(task)
 	assert.NoError(rs.T(), err)
 
@@ -49,7 +48,7 @@ func (rs *RepositorySuite) TestGetAllTasks() {
 	limit, offset := 10, 0
 	status := ""
 	tasks, err := rs.repository.GetAllTasks(limit, offset, status)
-	
+
 	assert.NoError(rs.T(), err)
 	assert.Equal(rs.T(), numberOfTasks, len(tasks))
 }
@@ -75,14 +74,12 @@ func (rs *RepositorySuite) TestRepositoryUpdateTask() {
 	task := NewTaskTest()
 	rs.dbHandler.Create(task)
 
-	data := &TaskData{Title: "newTitle", Description: "newDescription"}
-
-	updatedTask, err := rs.repository.UpdateTask(task.ID.String(), data)
+	updatedTask, err := rs.repository.UpdateTask(task.ID.String(), "newTitle", "newDescription", "")
 
 	assert.NoError(rs.T(), err)
 	assert.Equal(rs.T(), updatedTask.ID, task.ID)
-	assert.Equal(rs.T(), updatedTask.Title, data.Title)
-	assert.Equal(rs.T(), updatedTask.Description, data.Description)
+	assert.Equal(rs.T(), updatedTask.Title, "newTitle")
+	assert.Equal(rs.T(), updatedTask.Description, "newDescription")
 	assert.NotEqual(rs.T(), task.Title, updatedTask.Title)
 	assert.NotEqual(rs.T(), task.Description, updatedTask.Description)
 }

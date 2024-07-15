@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 
 	"strconv"
 )
@@ -12,8 +13,37 @@ type handler struct {
 	Repository *repository
 }
 
+type TaskSchemaOut struct {
+	ID          uuid.UUID `json:"id"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Status      string    `json:"status"`
+}
+
+func fromTaskData(task Task) TaskSchemaOut {
+	ts := TaskSchemaOut{ID: task.ID,
+		Title:       task.Title,
+		Description: task.Description,
+		Status:      task.Status}
+	return ts
+}
+
+func fromTaskDataSlice(tasks []Task) []TaskSchemaOut {
+	ts := make([]TaskSchemaOut, 0, len(tasks))
+	for _, value := range tasks {
+		ts = append(ts, fromTaskData(value))
+	}
+	return ts
+}
+
+type TaskSchemaIn struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Status      string `json:"status"`
+}
+
 func (h handler) PostTask(ctx *gin.Context) {
-	data := TaskData{}
+	data := TaskSchemaIn{}
 
 	if err := ctx.BindJSON(&data); err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -21,7 +51,7 @@ func (h handler) PostTask(ctx *gin.Context) {
 	}
 
 	task := NewTask()
-	task.AddData(data)
+	task.AddData(data.Title, data.Description)
 
 	_, err := h.Repository.AddTask(task)
 	if err != nil {
@@ -29,14 +59,14 @@ func (h handler) PostTask(ctx *gin.Context) {
 		return
 	}
 
-	ctx.IndentedJSON(http.StatusCreated, task)
+	ctx.IndentedJSON(http.StatusCreated, fromTaskData(*task))
 }
 
 func (h handler) GetTasks(ctx *gin.Context) {
-	limit, _ :=  strconv.Atoi(ctx.DefaultQuery("limit", "100"))
+	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "100"))
 	offset, _ := strconv.Atoi(ctx.DefaultQuery("offset", "0"))
 	status := ctx.DefaultQuery("status", "")
-	
+
 	tasks, err := h.Repository.GetAllTasks(limit, offset, status)
 
 	if err != nil {
@@ -44,7 +74,7 @@ func (h handler) GetTasks(ctx *gin.Context) {
 		return
 	}
 
-	ctx.IndentedJSON(http.StatusOK, tasks)
+	ctx.IndentedJSON(http.StatusOK, fromTaskDataSlice(tasks))
 }
 
 func (h handler) GetTaskByID(ctx *gin.Context) {
@@ -57,7 +87,7 @@ func (h handler) GetTaskByID(ctx *gin.Context) {
 		return
 	}
 
-	ctx.IndentedJSON(http.StatusOK, task)
+	ctx.IndentedJSON(http.StatusOK, fromTaskData(*task))
 }
 
 func (h handler) RemoveTaskByID(ctx *gin.Context) {
@@ -70,12 +100,12 @@ func (h handler) RemoveTaskByID(ctx *gin.Context) {
 		return
 	}
 
-	ctx.IndentedJSON(http.StatusOK, task)
+	ctx.IndentedJSON(http.StatusOK, fromTaskData(*task))
 }
 
 func (h handler) UpdateTask(ctx *gin.Context) {
 	id := ctx.Param("id")
-	data := &TaskData{}
+	data := &TaskSchemaIn{}
 
 	if err := ctx.BindJSON(data); err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -85,14 +115,14 @@ func (h handler) UpdateTask(ctx *gin.Context) {
 	if !IsValidStatus(data.Status) {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid status"})
 		return
-	} 
+	}
 
-	task, err := h.Repository.UpdateTask(id, data)
+	task, err := h.Repository.UpdateTask(id, data.Title, data.Description, data.Status)
 
 	if err != nil {
 		ctx.IndentedJSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, task)
+	ctx.JSON(http.StatusOK, fromTaskData(*task))
 }

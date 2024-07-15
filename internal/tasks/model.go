@@ -1,41 +1,52 @@
 package tasks
 
 import (
-	"slices"
-
 	"github.com/ebsouza/todo-app/internal/common/orm"
 	"github.com/google/uuid"
 )
 
-const statusDefault string = "CREATED"
+type taskStatus int
 
-var allStatus []string = []string{statusDefault, "IN_PROGRESS", "DONE"}
+const (
+	Created = iota + 1
+	InProgress
+	Done
+)
+
+var statusName = map[taskStatus]string{
+	Created:    "created",
+	InProgress: "inProgress",
+	Done:       "done",
+}
+
+func (ts taskStatus) String() string {
+	return statusName[ts]
+}
+
+func IsValidStatus(status string) bool {
+	for _, value := range statusName {
+		if status == value {
+			return true
+		}
+	}
+	return false
+}
 
 type Task struct {
 	orm.Base
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Status      string `json:"status"`
+	Title       string
+	Description string
+	Status      string
 }
 
-func (t *Task) AddData(data TaskData) {
-	t.Title = data.Title
-	t.Description = data.Description
-}
-
-type TaskData struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Status      string `json:"status"`
+func (t *Task) AddData(title string, description string) {
+	t.Title = title
+	t.Description = description
 }
 
 func NewTask() *Task {
 	task := &Task{}
 	task.ID = uuid.New()
-	task.Status = statusDefault
+	task.Status = statusName[Created]
 	return task
-}
-
-func IsValidStatus(status string) bool {
-	return slices.Contains(allStatus, status)
 }
