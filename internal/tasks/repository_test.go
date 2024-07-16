@@ -34,7 +34,7 @@ func (rs *RepositorySuite) TestGetTask() {
 func (rs *RepositorySuite) TestGetTaskNotFound() {
 	_, err := rs.repository.GetTask("id")
 	assert.Error(rs.T(), err)
-	assert.Equal(rs.T(), "Task not found", err.Error())
+	assert.Equal(rs.T(), taskNotFoundErrorMessage, err.Error())
 }
 
 func (rs *RepositorySuite) TestGetAllTasks() {
@@ -67,7 +67,7 @@ func (rs *RepositorySuite) TestDeleteTask() {
 func (rs *RepositorySuite) TestDeleteTaskNotFound() {
 	_, err := rs.repository.DeleteTask("id")
 	assert.Error(rs.T(), err)
-	assert.Equal(rs.T(), "Task not found", err.Error())
+	assert.Equal(rs.T(), taskNotFoundErrorMessage, err.Error())
 }
 
 func (rs *RepositorySuite) TestRepositoryUpdateTask() {

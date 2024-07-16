@@ -10,6 +10,14 @@ import (
 	"time"
 )
 
+const (
+	taskCreationErrorMessage     string = "Task could not be created"
+	taskNotFoundErrorMessage     string = "Task not found"
+	taskNotRecoveredErrorMessage string = "Tasks could not be recovered"
+	taskNotRemovedErrorMessage   string = "Task could not be removed"
+	taskNotUpdatedErrorMessage   string = "Task could not be updated"
+)
+
 type repository struct {
 	DB *gorm.DB
 }
@@ -21,7 +29,7 @@ func NewRepository(db *gorm.DB) *repository {
 
 func (r repository) AddTask(task *Task) (uuid.UUID, error) {
 	if result := r.DB.Create(task); result.Error != nil {
-		return task.ID, errors.New("Task could not be created")
+		return task.ID, errors.New(taskCreationErrorMessage)
 	}
 
 	return task.ID, nil
@@ -31,7 +39,7 @@ func (r repository) GetTask(id string) (*Task, error) {
 	task := &Task{}
 
 	if result := r.DB.First(task, "id = ?", id); result.Error != nil {
-		return task, errors.New("Task not found")
+		return task, errors.New(taskNotFoundErrorMessage)
 	}
 
 	return task, nil
@@ -41,7 +49,7 @@ func (r repository) GetAllTasks(limit int, offset int, status string) ([]Task, e
 	tasks := []Task{}
 
 	if result := r.DB.Where(&Task{Status: status}).Order("created_at asc").Limit(limit).Offset(offset).Find(&tasks); result.Error != nil {
-		return tasks, errors.New("Tasks could not be recovered")
+		return tasks, errors.New(taskNotRecoveredErrorMessage)
 	}
 
 	return tasks, nil
@@ -51,11 +59,11 @@ func (r repository) DeleteTask(id string) (*Task, error) {
 	task, err := r.GetTask(id)
 
 	if err != nil {
-		return &Task{}, errors.New("Task not found")
+		return &Task{}, errors.New(taskNotFoundErrorMessage)
 	}
 
 	if result := r.DB.Delete(task); result.Error != nil {
-		return task, errors.New("Task could not be removed")
+		return task, errors.New(taskNotRemovedErrorMessage)
 	}
 
 	return task, nil
@@ -65,7 +73,7 @@ func (r repository) UpdateTask(id string, title string, description string, stat
 	task, err := r.GetTask(id)
 
 	if err != nil {
-		return &Task{}, errors.New("Task not found")
+		return &Task{}, errors.New(taskNotFoundErrorMessage)
 	}
 
 	task.Title = title
@@ -74,7 +82,7 @@ func (r repository) UpdateTask(id string, title string, description string, stat
 	task.UpdatedAt = time.Now()
 
 	if result := r.DB.Save(task); result.Error != nil {
-		return task, errors.New("tasks could not be updated")
+		return task, errors.New(taskNotUpdatedErrorMessage)
 	}
 
 	return task, nil
