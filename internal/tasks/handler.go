@@ -9,8 +9,10 @@ import (
 	"strconv"
 )
 
-type handler struct {
-	Repository *repository
+type TaskSchemaIn struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Status      string `json:"status"`
 }
 
 type TaskSchemaOut struct {
@@ -36,10 +38,8 @@ func fromTaskDataSlice(tasks []Task) []TaskSchemaOut {
 	return ts
 }
 
-type TaskSchemaIn struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Status      string `json:"status"`
+type handler struct {
+	Repository *repository
 }
 
 func (h handler) PostTask(ctx *gin.Context) {
